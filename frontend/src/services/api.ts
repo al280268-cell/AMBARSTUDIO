@@ -51,10 +51,10 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 
   const res = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
 
-  if (res.status === 401) {
+  if (res.status === 401 && !endpoint.includes('/auth/login') && !endpoint.includes('/auth/register')) {
     localStorage.removeItem('ambar_auth');
     window.location.href = '/login';
-    throw new Error('Sesion expirada');
+    throw new Error('Sesión expirada');
   }
 
   if (!res.ok) {
