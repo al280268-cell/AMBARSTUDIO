@@ -13,9 +13,9 @@ from dotenv import load_dotenv
 ENV = os.getenv("AMBAR_ENV", "development")  # "development" | "production"
 
 if ENV == "production":
-    load_dotenv(".env.production", override=True)
+    load_dotenv(".env.production", override=False)
 else:
-    load_dotenv(".env.development", override=True)
+    load_dotenv(".env.development", override=False)
 
 # Siempre cargar .env como fallback
 load_dotenv(".env", override=False)
