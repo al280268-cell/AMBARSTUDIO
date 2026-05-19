@@ -129,7 +129,17 @@ export default function AIStudio() {
           <p style={{ color: 'var(--secondary)', fontSize: 16 }}>Sube una foto, elige un estilo y deja que la IA transforme tu espacio</p>
         </header>
 
-        {error && <div className="alert-error" role="alert" style={{ marginBottom: 24 }}><span className="material-symbols-outlined" style={{ fontSize: 16 }}>error</span>{error}</div>}
+        {error && (
+          <div className="alert-error" role="alert" style={{ marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 16 }}>error</span>
+              {error}
+            </div>
+            {error.includes('tokens') && (
+              <Link to="/plans" className="btn btn-primary btn-sm" style={{ whiteSpace: 'nowrap' }}>Adquirir Tokens</Link>
+            )}
+          </div>
+        )}
 
         <div className="studio-grid">
           {/* Main Area */}
