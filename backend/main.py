@@ -5,7 +5,7 @@ FastAPI entry point · Aguascalientes, MX
 import os
 import logging
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from config import settings
@@ -72,6 +72,19 @@ app = FastAPI(
     redoc_url="/redoc" if settings.is_development else None,
 )
 
+# ── Vercel Path Rewrite Middleware ──
+@app.middleware("http")
+async def rewrite_vercel_paths(request: Request, call_next):
+    """
+    Vercel's routePrefix='/api' strips the '/api' from the path before passing it to FastAPI.
+    Since our routers use prefix='/api/...', we need to add it back so they match.
+    """
+    if os.getenv("VERCEL"):
+        path = request.scope.get("path", "")
+        if not path.startswith("/api") and not path.startswith("/uploads") and not path.startswith("/docs") and not path.startswith("/redoc") and path != "/":
+            request.scope["path"] = "/api" + path
+    return await call_next(request)
+
 # ── Security Middleware Stack (order matters: first added = outermost) ──
 # 1. Request logging (outermost — logs everything)
 app.add_middleware(RequestLoggingMiddleware)
@@ -89,8 +102,12 @@ app.add_middleware(
 )
 
 # ── Static Files ──
-UPLOAD_DIR = "/tmp/uploads" if os.getenv("VERCEL") else os.path.join(os.path.dirname(__file__), "uploads")
-os.makedirs(UPLOAD_DIR, exist_ok=True)
+UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "uploads")
+try:
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
+except OSError:
+    UPLOAD_DIR = "/tmp/uploads"
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 # ── Register All Routers ──
