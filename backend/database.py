@@ -20,13 +20,21 @@ if "pg8000" in DATABASE_URL:
     ctx.verify_mode = ssl.CERT_NONE
     connect_args["ssl_context"] = ctx
 
-engine = create_engine(DATABASE_URL, connect_args=connect_args, echo=settings.DEBUG)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
+engine = None
+SessionLocal = None
+try:
+    engine = create_engine(DATABASE_URL, connect_args=connect_args, echo=settings.DEBUG)
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+except Exception as e:
+    import logging
+    logging.getLogger("ambar").error(f"Engine creation failed: {e}")
 
+Base = declarative_base()
 
 def get_db():
     """Dependency injection for database sessions."""
+    if SessionLocal is None:
+        raise Exception("Database engine failed to initialize")
     db = SessionLocal()
     try:
         yield db
@@ -36,4 +44,5 @@ def get_db():
 
 def init_db():
     """Create all tables. Called on app startup."""
-    Base.metadata.create_all(bind=engine)
+    if engine is not None:
+        Base.metadata.create_all(bind=engine)
