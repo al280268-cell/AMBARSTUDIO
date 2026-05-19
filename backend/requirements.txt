@@ -1,0 +1,47 @@
+# ══════════════════════════════════════════════════════════
+# AMBAR STUDIO — Dependencias Python
+# pip install -r requirements.txt
+# ══════════════════════════════════════════════════════════
+
+# === Core Framework ===
+fastapi==0.104.1
+uvicorn==0.24.0
+sqlalchemy==2.0.23
+
+# === Authentication ===
+python-jose[cryptography]==3.3.0
+passlib==1.7.4
+bcrypt==4.0.1
+
+# === File Upload ===
+python-multipart==0.0.6
+
+# === AI Services ===
+openai==1.6.1
+google-generativeai==0.3.2
+
+# === Payments ===
+stripe==5.5.0
+certifi
+
+# === HTTP Client ===
+httpx==0.25.2
+
+# === Image Processing ===
+pillow==10.1.0
+
+# === Environment ===
+python-dotenv==1.0.0
+
+# === Async Files ===
+aiofiles==23.2.1
+
+# === Validation ===
+pydantic[email]==2.5.3
+
+# === Async Support ===
+greenlet==3.0.3
+
+# === Production (uncomment for cloud deployment) ===
+# gunicorn==21.2.0
+# psycopg2-binary==2.9.9

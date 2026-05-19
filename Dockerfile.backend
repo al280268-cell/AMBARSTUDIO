@@ -1,0 +1,40 @@
+# ══════════════════════════════════════════════════════════
+# AMBAR STUDIO — Dockerfile Backend (Producción)
+# Build: docker build -f Dockerfile.backend -t ambar-backend .
+# Run:   docker run -p 8000:8000 --env-file backend/.env.production ambar-backend
+# ══════════════════════════════════════════════════════════
+FROM python:3.11-slim
+
+# Set environment
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    AMBAR_ENV=production
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc libpq-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+COPY backend/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt \
+    && pip install --no-cache-dir psycopg2-binary gunicorn
+
+# Copy application code
+COPY backend/ .
+
+# Create uploads directory
+RUN mkdir -p uploads
+
+# Expose port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"
+
+# Run with Gunicorn for production
+CMD ["gunicorn", "main:app", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", \
+     "--bind", "0.0.0.0:8000", "--access-logfile", "-", "--error-logfile", "-"]

@@ -1,0 +1,68 @@
+# ══════════════════════════════════════════════════════════
+# AMBAR STUDIO — Docker Compose (Producción)
+# Ejecutar: docker-compose up -d
+# ══════════════════════════════════════════════════════════
+version: "3.9"
+
+services:
+  # ──────────────────────────────────────────────
+  # PostgreSQL Database
+  # ──────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: ambar_studio
+      POSTGRES_USER: ambar
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-ambar_secure_2024}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ambar -d ambar_studio"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ──────────────────────────────────────────────
+  # FastAPI Backend
+  # ──────────────────────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      AMBAR_ENV: production
+      DATABASE_URL: postgresql://ambar:${DB_PASSWORD:-ambar_secure_2024}@db:5432/ambar_studio
+      SECRET_KEY: ${SECRET_KEY:-change-this-in-production}
+      APP_MODE: production
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      CORS_ORIGINS: ${CORS_ORIGINS:-https://ambar.studio}
+    volumes:
+      - uploads:/app/uploads
+    ports:
+      - "8000:8000"
+
+  # ──────────────────────────────────────────────
+  # React Frontend (Nginx)
+  # ──────────────────────────────────────────────
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"
+
+volumes:
+  pgdata:
+  uploads:
