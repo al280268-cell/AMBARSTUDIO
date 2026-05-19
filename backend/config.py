@@ -35,8 +35,13 @@ class Settings:
 
     # Database
     _db_url = os.getenv("DATABASE_URL")
-    if _db_url and _db_url.startswith("postgres://"):
-        _db_url = _db_url.replace("postgres://", "postgresql://", 1)
+    if _db_url:
+        if "?" in _db_url:
+            _db_url = _db_url.split("?")[0]  # Remove ?sslmode=require which breaks pg8000
+        if _db_url.startswith("postgres://"):
+            _db_url = _db_url.replace("postgres://", "postgresql+pg8000://", 1)
+        elif _db_url.startswith("postgresql://"):
+            _db_url = _db_url.replace("postgresql://", "postgresql+pg8000://", 1)
             
     DATABASE_URL: str = _db_url or ("sqlite:////tmp/ambar_studio.db" if os.getenv("VERCEL") else "sqlite:///./ambar_studio.db")
 

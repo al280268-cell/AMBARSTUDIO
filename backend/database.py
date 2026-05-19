@@ -13,6 +13,12 @@ DATABASE_URL = settings.DATABASE_URL
 
 # SQLite needs check_same_thread=False for FastAPI's async nature
 connect_args = {"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
+if "pg8000" in DATABASE_URL:
+    import ssl
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    connect_args["ssl_context"] = ctx
 
 engine = create_engine(DATABASE_URL, connect_args=connect_args, echo=settings.DEBUG)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
