@@ -131,7 +131,7 @@ export default function AIStudio() {
 
         {error && <div className="alert-error" role="alert" style={{ marginBottom: 24 }}><span className="material-symbols-outlined" style={{ fontSize: 16 }}>error</span>{error}</div>}
 
-        <div className="studio-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 400px', gap: 24, alignItems: 'start' }}>
+        <div className="studio-grid">
           {/* Main Area */}
           <div className="card" style={{ minHeight: 500, position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
 
