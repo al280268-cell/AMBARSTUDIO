@@ -36,11 +36,21 @@ logging.basicConfig(
 logger = logging.getLogger("ambar")
 
 
+# Store startup error globally to return it in /api/health for debugging
+startup_error = None
+
 @asynccontextmanager
 async def lifespan(app):
+    global startup_error
     """Application lifecycle: init DB, seed data, log startup."""
-    init_db()
-    seed_demo_data()
+    try:
+        init_db()
+        seed_demo_data()
+    except Exception as e:
+        import traceback
+        startup_error = traceback.format_exc()
+        logger.error(f"Startup DB Error: {startup_error}")
+        
     logger.info(
         f"══════════════════════════════════════════\n"
         f"   AMBAR STUDIO API v1.0.0\n"
@@ -113,4 +123,5 @@ def health():
         "status": "ok",
         "mode": settings.APP_MODE,
         "version": "1.0.0",
+        "error": startup_error
     }
