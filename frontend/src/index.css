@@ -491,4 +491,6 @@ input, textarea, select { font-family: inherit; }
   .page { padding: 80px 16px 60px; }
   .footer-bottom { flex-direction: column; align-items: flex-start; }
   .chat-widget { width: 100%; max-width: 100%; right: 0; left: 0; bottom: 0; border-radius: 0; max-height: calc(100vh - 72px); }
+  .mobile-btn-wrap { white-space: normal; height: auto; text-align: center; line-height: 1.4; font-size: 11px; padding: 14px 20px; }
+  .chat-widget-toggle { bottom: 20px; right: 20px; transform: scale(0.9); }
 }

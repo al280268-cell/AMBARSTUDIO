@@ -55,13 +55,13 @@ export default function Landing() {
               <span className="material-symbols-outlined" style={{ fontSize: 16, color: 'var(--primary)' }}>location_on</span>
               <span style={{ fontSize: 12, fontFamily: 'var(--font-label)', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Aguascalientes, MX</span>
             </div>
-            <h1 className="section-title" style={{ marginBottom: 20, fontSize: 'clamp(40px, 5vw, 56px)', letterSpacing: '-0.02em' }}>
+            <h1 className="section-title" style={{ marginBottom: 20, fontSize: 'clamp(32px, 8vw, 56px)', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
               Inspiración que se convierte en realidad
             </h1>
-            <p className="section-subtitle" style={{ marginBottom: 40, maxWidth: 520, fontSize: 18 }}>
+            <p className="section-subtitle" style={{ marginBottom: 40, maxWidth: 520, fontSize: 'clamp(16px, 4vw, 18px)' }}>
               Imagina. Crea. Transforma. Diseño inteligente impulsado por IA para revolucionar los espacios de tu hogar.
             </p>
-            <Link to={user ? '/studio' : '/register'} className="btn btn-primary btn-lg glow-primary" style={{ marginBottom: 40, borderRadius: 999 }}>
+            <Link to={user ? '/studio' : '/register'} className="btn btn-primary btn-lg glow-primary mobile-btn-wrap" style={{ marginBottom: 40, borderRadius: 999 }}>
               <span className="material-symbols-outlined" style={{ fontSize: 20 }}>auto_awesome</span>
               {user ? 'Ir al Estudio' : 'Iniciar Transformación Mágica'}
             </Link>
