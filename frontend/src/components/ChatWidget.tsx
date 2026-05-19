@@ -60,16 +60,7 @@ export default function ChatWidget() {
 
   if (!open) {
     return (
-      <button onClick={() => setOpen(true)} className="chat-widget-toggle" aria-label="Abrir chat"
-        style={{
-          position: 'fixed', bottom: 24, right: 24, display: 'flex', alignItems: 'center', gap: 10,
-          padding: '14px 20px', borderRadius: 'var(--radius-full)',
-          background: 'var(--primary)', color: 'var(--on-primary)',
-          boxShadow: '0 8px 32px rgba(23,48,40,0.3)', zIndex: 1000,
-          border: 'none', cursor: 'pointer', fontFamily: 'var(--font-label)',
-          fontSize: 13, fontWeight: 600, transition: 'all 0.3s',
-          width: 'auto', height: 'auto',
-        }}>
+      <button onClick={() => setOpen(true)} className="chat-widget-toggle-pill" aria-label="Abrir chat">
         <span className="material-symbols-outlined filled" style={{ fontSize: 20 }}>support_agent</span>
         ¿Necesitas ayuda?
       </button>

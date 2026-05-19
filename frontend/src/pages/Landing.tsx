@@ -45,7 +45,7 @@ export default function Landing() {
   return (
     <main className="page gradient-bg-animated" style={{ padding: 0 }}>
       {/* Hero */}
-      <section className="hero-grid" style={{ paddingTop: 104, paddingBottom: 80, paddingLeft: 32, paddingRight: 32, position: 'relative', overflow: 'hidden' }}>
+      <section className="hero-grid" style={{ position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: '-10%', left: '-10%', width: '50vw', height: '50vw', background: 'var(--primary-fixed)', filter: 'blur(100px)', borderRadius: '50%', opacity: 0.6, zIndex: 0 }} />
         <div style={{ position: 'absolute', bottom: '-20%', right: '-10%', width: '40vw', height: '40vw', background: 'var(--secondary-container)', filter: 'blur(100px)', borderRadius: '50%', opacity: 0.5, zIndex: 0 }} />
 

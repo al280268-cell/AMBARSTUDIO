@@ -34,7 +34,7 @@ class Settings:
     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
 
     # Database
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./ambar_studio.db")
+    DATABASE_URL: str = "sqlite:////tmp/ambar_studio.db" if os.getenv("VERCEL") else os.getenv("DATABASE_URL", "sqlite:///./ambar_studio.db")
 
     # AI
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")

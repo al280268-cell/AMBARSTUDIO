@@ -408,7 +408,7 @@ input, textarea, select { font-family: inherit; }
 /* ══════════════════════════════════════════════
    HERO
    ══════════════════════════════════════════════ */
-.hero-grid { display: grid; grid-template-columns: minmax(0,1.05fr) minmax(300px,0.95fr); gap: 32px; align-items: stretch; position: relative; }
+.hero-grid { display: grid; grid-template-columns: minmax(0,1.05fr) minmax(300px,0.95fr); gap: 32px; align-items: stretch; position: relative; padding: 104px 32px 80px; }
 .hero-content { background: var(--surface-container-low); display: flex; flex-direction: column; justify-content: center; padding: 80px 64px; position: relative; z-index: 1; }
 .hero-image-col { position: relative; overflow: hidden; min-height: 520px; border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); }
 .hero-image-col img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -451,7 +451,7 @@ input, textarea, select { font-family: inherit; }
 .chat-widget-input { flex: 1; min-height: 40px; padding: 10px 14px; background: var(--surface-container-highest); border: 1px solid transparent; border-radius: var(--radius-md); outline: none; transition: all var(--transition-fast); font-size: 13px; }
 .chat-widget-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(23,48,40,0.08); }
 .chat-widget-toggle { position: fixed; bottom: 24px; right: 24px; width: 56px; height: 56px; border-radius: 50%; background: var(--primary-container); color: var(--on-primary); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 32px rgba(0,0,0,0.2); z-index: 1000; border: none; }
-
+.chat-widget-toggle-pill { position: fixed; bottom: 24px; right: 24px; display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-radius: var(--radius-full); background: var(--primary); color: var(--on-primary); box-shadow: 0 8px 32px rgba(23,48,40,0.3); z-index: 1000; border: none; cursor: pointer; font-family: var(--font-label); font-size: 13px; font-weight: 600; transition: all 0.3s; }
 /* ── Token cost table ── */
 .token-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .token-table th { text-align: left; padding: 10px 12px; font-family: var(--font-label); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--secondary); border-bottom: 2px solid var(--outline-variant); }
@@ -478,13 +478,14 @@ input, textarea, select { font-family: inherit; }
   .auth-card { padding: 32px 24px; }
   .auth-title { font-size: 32px; }
   .page { padding: 88px 16px 60px; }
+  .hero-grid { padding: 88px 16px 40px; }
   .footer { padding: 48px 20px 24px; }
   .footer-grid { grid-template-columns: 1fr; gap: 24px; }
   .navbar-inner { padding: 0 20px; }
   .hero-content { padding: 40px 20px; }
   .hero-panel { position: static; transform: none; max-width: none; margin-top: 24px; }
   .hero-image-col { border-radius: var(--radius-lg); }
-  .chat-widget, .chat-widget-toggle { right: 16px; bottom: 16px; }
+  .chat-widget, .chat-widget-toggle, .chat-widget-toggle-pill { right: 16px; bottom: 16px; }
 }
 @media (max-width: 520px) {
   .hero-content { padding: 32px 18px; }
