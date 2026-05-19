@@ -22,8 +22,8 @@ export default function Footer() {
             <div className="footer-col-title">Recursos</div>
             <Link to="/plans" className="footer-col-link">Tokens y Créditos</Link>
             <Link to="/providers" className="footer-col-link">Directorio AGS</Link>
-            <a href="#" className="footer-col-link">Soporte</a>
-            <a href="#" className="footer-col-link">Términos de Uso</a>
+            <Link to="/terms" className="footer-col-link">Políticas de Uso</Link>
+            <Link to="/privacy" className="footer-col-link">Aviso de Privacidad</Link>
           </div>
           <div>
             <div className="footer-col-title">Contacto</div>

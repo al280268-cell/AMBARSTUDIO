@@ -13,6 +13,8 @@ import AIStudio from './pages/AIStudio';
 import Providers from './pages/Providers';
 import Plans from './pages/Plans';
 import AdminDashboard from './pages/AdminDashboard';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
 import './index.css';
 import type { ReactNode } from 'react';
 
@@ -45,6 +47,8 @@ function AppRoutes() {
         <Route path="/provider-portal" element={<ProtectedRoute><ProviderDashboard /></ProtectedRoute>} />
         <Route path="/studio" element={<ProtectedRoute>{user?.role === 'user' ? <AIStudio /> : <Navigate to="/dashboard" />}</ProtectedRoute>} />
         <Route path="/studio/:projectId" element={<ProtectedRoute>{user?.role === 'user' ? <AIStudio /> : <Navigate to="/dashboard" />}</ProtectedRoute>} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
       <Footer />
