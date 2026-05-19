@@ -34,7 +34,14 @@ class Settings:
     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
 
     # Database
-    DATABASE_URL: str = os.getenv("DATABASE_URL") or ("sqlite:////tmp/ambar_studio.db" if os.getenv("VERCEL") else "sqlite:///./ambar_studio.db")
+    _db_url = os.getenv("DATABASE_URL")
+    if _db_url:
+        if _db_url.startswith("postgres://"):
+            _db_url = _db_url.replace("postgres://", "postgresql://", 1)
+        if _db_url.startswith("postgresql://"):
+            _db_url = _db_url.replace("postgresql://", "postgresql+pg8000://", 1)
+            
+    DATABASE_URL: str = _db_url or ("sqlite:////tmp/ambar_studio.db" if os.getenv("VERCEL") else "sqlite:///./ambar_studio.db")
 
     # AI
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")

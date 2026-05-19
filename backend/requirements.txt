@@ -44,4 +44,4 @@ greenlet==3.0.3
 
 # === Production (uncomment for cloud deployment) ===
 # gunicorn==21.2.0
-psycopg2-binary==2.9.9
+pg8000==1.30.3
