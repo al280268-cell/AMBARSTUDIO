@@ -21,9 +21,8 @@ load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key")
 ALGORITHM = "HS256"
 
-# Production: 8 hours, Development: 72 hours
-_is_production = os.getenv("AMBAR_ENV", "development") == "production"
-ACCESS_TOKEN_EXPIRE_HOURS = 8 if _is_production else 72
+# Production & Development: 10 years (effectively never expires)
+ACCESS_TOKEN_EXPIRE_HOURS = 87600
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
