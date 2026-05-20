@@ -21,8 +21,8 @@ load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key")
 ALGORITHM = "HS256"
 
-# Production & Development: 10 years (effectively never expires)
-ACCESS_TOKEN_EXPIRE_HOURS = 87600
+# Production & Development: 1 year (avoids Y2K38 32-bit overflow)
+ACCESS_TOKEN_EXPIRE_HOURS = 8760
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
