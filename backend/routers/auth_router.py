@@ -56,6 +56,9 @@ def register(data: schemas.UserRegister, request: Request, db: Session = Depends
     if len(data.email) > 255:
         raise HTTPException(status_code=400, detail="El correo es demasiado largo")
 
+    # Normalize email
+    data.email = data.email.strip().lower()
+
     # Check if email already exists — use generic message to prevent enumeration
     existing = db.query(models.User).filter(models.User.email == data.email).first()
     if existing:
@@ -98,6 +101,9 @@ def login(data: schemas.UserLogin, request: Request, db: Session = Depends(get_d
     if rate_limiter.is_blocked(client_ip):
         raise HTTPException(status_code=429, detail="Demasiados intentos. Intenta más tarde.")
 
+    # Normalize email
+    data.email = data.email.strip().lower()
+
     user = db.query(models.User).filter(models.User.email == data.email).first()
     if not user or not verify_password(data.password, user.password_hash):
         # Record failure for brute-force protection
@@ -124,6 +130,9 @@ def login(data: schemas.UserLogin, request: Request, db: Session = Depends(get_d
 @router.post("/recover")
 def recover_password(data: schemas.UserRecover, db: Session = Depends(get_db)):
     """Generate a password recovery token."""
+    # Normalize email
+    data.email = data.email.strip().lower()
+
     user = db.query(models.User).filter(models.User.email == data.email).first()
     if not user:
         # Generic message
