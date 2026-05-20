@@ -90,8 +90,8 @@ async def rewrite_vercel_paths(request: Request, call_next):
 app.add_middleware(RequestLoggingMiddleware)
 # 2. Security headers (adds headers to all responses)
 app.add_middleware(SecurityHeadersMiddleware)
-# 3. Rate limiting (blocks abusive IPs before processing)
-app.add_middleware(RateLimitMiddleware)
+# 3. Rate limiting (disabled so the app can be used normally without interruptions)
+# app.add_middleware(RateLimitMiddleware)
 # 4. CORS (controls cross-origin access)
 app.add_middleware(
     CORSMiddleware,
