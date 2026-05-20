@@ -77,6 +77,13 @@ export default function Plans() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const sessionId = params.get('session_id');
+    const paymentStatus = params.get('payment');
+    
+    if (paymentStatus === 'cancelled') {
+       window.history.replaceState({}, '', '/plans');
+       alert('Pago cancelado. No se hizo ningún cargo.');
+    }
+    
     if (sessionId && user) {
       api.confirmPayment(sessionId).then((res) => {
         refreshUser();
@@ -86,6 +93,7 @@ export default function Plans() {
       }).catch((err: unknown) => {
         console.error(err);
         window.history.replaceState({}, '', '/plans');
+        alert(err instanceof Error ? err.message : 'Error al verificar el pago');
       });
     }
   }, [user]);
