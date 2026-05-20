@@ -72,6 +72,10 @@ const api = {
     request<AuthData>('/api/auth/register', { method: 'POST', body: JSON.stringify(data) }),
   login: (data: LoginPayload) =>
     request<AuthData>('/api/auth/login', { method: 'POST', body: JSON.stringify(data) }),
+  recoverPassword: (email: string) =>
+    request<{ detail: string; demo_token?: string }>('/api/auth/recover', { method: 'POST', body: JSON.stringify({ email }) }),
+  resetPassword: (data: { token: string; password: string }) =>
+    request<{ detail: string }>('/api/auth/reset', { method: 'POST', body: JSON.stringify(data) }),
   getMe: () =>
     request<User>('/api/auth/me'),
   updateProfile: (data: { name?: string; city?: string }) =>

@@ -65,6 +65,25 @@ def decode_token(token: str) -> dict:
         )
 
 
+def create_reset_token(email: str) -> str:
+    expire = datetime.now(timezone.utc) + timedelta(minutes=15)
+    to_encode = {"sub": email, "exp": expire, "type": "reset"}
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+
+def decode_reset_token(token: str) -> str:
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        if payload.get("type") != "reset":
+            raise HTTPException(status_code=400, detail="Token no válido")
+        email = payload.get("sub")
+        if not email:
+            raise HTTPException(status_code=400, detail="Token no válido")
+        return email
+    except JWTError:
+        raise HTTPException(status_code=400, detail="Token expirado o inválido")
+
+
 def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
     db: Session = Depends(get_db)

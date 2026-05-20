@@ -13,6 +13,7 @@ import models
 import schemas
 from auth import get_current_user, require_admin
 from security import sanitize_string, check_suspicious_input
+from encryption import encrypt_data, decrypt_data
 import math
 
 logger = logging.getLogger("ambar.providers")
@@ -114,17 +115,31 @@ def create_or_update_provider(
     if provider:
         # Update existing
         for key, value in data.model_dump(exclude_unset=True).items():
+            if key in ["whatsapp", "contact_email", "bio", "instagram"]:
+                value = encrypt_data(value) if value else value
             setattr(provider, key, value)
     else:
         # Create new
-        provider = models.Provider(user_id=current_user.id, **data.model_dump())
+        provider_data = data.model_dump()
+        for key in ["whatsapp", "contact_email", "bio", "instagram"]:
+            if provider_data.get(key):
+                provider_data[key] = encrypt_data(provider_data[key])
+        
+        provider = models.Provider(user_id=current_user.id, **provider_data)
         db.add(provider)
 
     db.commit()
     db.refresh(provider)
 
     result = schemas.ProviderOut.model_validate(provider)
-    result.user_name = current_user.name
+    result.user_name = decrypt_data(current_user.name)
+    
+    # Decrypt for response
+    result.whatsapp = decrypt_data(result.whatsapp) if result.whatsapp else ""
+    result.contact_email = decrypt_data(result.contact_email) if result.contact_email else ""
+    result.bio = decrypt_data(result.bio) if result.bio else ""
+    result.instagram = decrypt_data(result.instagram) if result.instagram else ""
+    
     return result
 
 
@@ -239,7 +254,7 @@ def delete_product(
             except OSError:
                 pass
 
-    db.delete(product)
+    product.is_active = False
     db.commit()
     return {"detail": "Producto eliminado"}
 
@@ -278,7 +293,11 @@ def list_providers(
     for p in providers:
         out = schemas.ProviderOut.model_validate(p)
         user = db.query(models.User).filter(models.User.id == p.user_id).first()
-        out.user_name = user.name if user else ""
+        out.user_name = decrypt_data(user.name) if user else ""
+        out.whatsapp = decrypt_data(p.whatsapp) if p.whatsapp else ""
+        out.contact_email = decrypt_data(p.contact_email) if p.contact_email else ""
+        out.bio = decrypt_data(p.bio) if p.bio else ""
+        out.instagram = decrypt_data(p.instagram) if p.instagram else ""
         results.append(out)
 
     return results
@@ -295,7 +314,11 @@ def list_all_providers(
     for p in providers:
         out = schemas.ProviderOut.model_validate(p)
         user = db.query(models.User).filter(models.User.id == p.user_id).first()
-        out.user_name = user.name if user else ""
+        out.user_name = decrypt_data(user.name) if user else ""
+        out.whatsapp = decrypt_data(p.whatsapp) if p.whatsapp else ""
+        out.contact_email = decrypt_data(p.contact_email) if p.contact_email else ""
+        out.bio = decrypt_data(p.bio) if p.bio else ""
+        out.instagram = decrypt_data(p.instagram) if p.instagram else ""
         results.append(out)
     return results
 
@@ -329,7 +352,11 @@ def get_nearby_providers(
         if dist <= radius_km:
             out = schemas.ProviderOut.model_validate(p)
             user = db.query(models.User).filter(models.User.id == p.user_id).first()
-            out.user_name = user.name if user else ""
+            out.user_name = decrypt_data(user.name) if user else ""
+            out.whatsapp = decrypt_data(p.whatsapp) if p.whatsapp else ""
+            out.contact_email = decrypt_data(p.contact_email) if p.contact_email else ""
+            out.bio = decrypt_data(p.bio) if p.bio else ""
+            out.instagram = decrypt_data(p.instagram) if p.instagram else ""
             nearby.append(out)
 
     return nearby
@@ -344,7 +371,11 @@ def get_provider(provider_id: int, db: Session = Depends(get_db)):
 
     result = schemas.ProviderOut.model_validate(provider)
     user = db.query(models.User).filter(models.User.id == provider.user_id).first()
-    result.user_name = user.name if user else ""
+    result.user_name = decrypt_data(user.name) if user else ""
+    result.whatsapp = decrypt_data(provider.whatsapp) if provider.whatsapp else ""
+    result.contact_email = decrypt_data(provider.contact_email) if provider.contact_email else ""
+    result.bio = decrypt_data(provider.bio) if provider.bio else ""
+    result.instagram = decrypt_data(provider.instagram) if provider.instagram else ""
     return result
 
 
@@ -372,7 +403,7 @@ def list_products(
     db: Session = Depends(get_db)
 ):
     """List all products, optionally filtered by category."""
-    query = db.query(models.Product)
+    query = db.query(models.Product).filter(models.Product.is_active == True)
     if category:
         cat = sanitize_string(category)
         if check_suspicious_input(cat):
@@ -384,4 +415,4 @@ def list_products(
 @router.get("/{provider_id}/products", response_model=List[schemas.ProductOut])
 def get_provider_products(provider_id: int, db: Session = Depends(get_db)):
     """Get all products for a specific provider."""
-    return db.query(models.Product).filter(models.Product.provider_id == provider_id).all()
+    return db.query(models.Product).filter(models.Product.provider_id == provider_id, models.Product.is_active == True).all()

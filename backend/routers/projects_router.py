@@ -97,7 +97,7 @@ def list_projects(
     """List all projects for the current user."""
     projects = (
         db.query(models.Project)
-        .filter(models.Project.user_id == current_user.id)
+        .filter(models.Project.user_id == current_user.id, models.Project.is_active == True)
         .order_by(models.Project.created_at.desc())
         .all()
     )
@@ -113,7 +113,7 @@ def get_project(
     """Get a single project by ID."""
     project = (
         db.query(models.Project)
-        .filter(models.Project.id == project_id, models.Project.user_id == current_user.id)
+        .filter(models.Project.id == project_id, models.Project.user_id == current_user.id, models.Project.is_active == True)
         .first()
     )
     if not project:
@@ -130,7 +130,7 @@ async def generate_project_design(
     """Generate AI design for a project. Consumes 1 token."""
     project = (
         db.query(models.Project)
-        .filter(models.Project.id == project_id, models.Project.user_id == current_user.id)
+        .filter(models.Project.id == project_id, models.Project.user_id == current_user.id, models.Project.is_active == True)
         .first()
     )
     if not project:
@@ -212,6 +212,6 @@ def delete_project(
     if not project:
         raise HTTPException(status_code=404, detail="Proyecto no encontrado")
 
-    db.delete(project)
+    project.is_active = False
     db.commit()
     return {"detail": "Proyecto eliminado"}

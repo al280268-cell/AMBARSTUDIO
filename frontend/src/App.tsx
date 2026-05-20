@@ -7,6 +7,8 @@ import ScrollToTop from './components/ScrollToTop';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import RecoverPassword from './pages/RecoverPassword';
+import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
 import ProviderDashboard from './pages/ProviderDashboard';
 import AIStudio from './pages/AIStudio';
@@ -41,6 +43,8 @@ function AppRoutes() {
         <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Landing />} />
         <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
         <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register />} />
+        <Route path="/recover-password" element={user ? <Navigate to="/dashboard" /> : <RecoverPassword />} />
+        <Route path="/reset-password" element={user ? <Navigate to="/dashboard" /> : <ResetPassword />} />
         <Route path="/plans" element={<Plans />} />
         <Route path="/providers" element={<Providers />} />
         <Route path="/dashboard" element={<ProtectedRoute><SmartDashboard /></ProtectedRoute>} />

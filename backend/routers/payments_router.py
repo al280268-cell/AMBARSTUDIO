@@ -83,7 +83,7 @@ def confirm_payment(
     payment = db.query(models.Payment).filter(
         models.Payment.stripe_session_id == session_id,
         models.Payment.user_id == current_user.id,
-    ).first()
+    ).with_for_update().first()
     
     if not payment:
         raise HTTPException(status_code=404, detail="Pago no encontrado")
@@ -128,7 +128,9 @@ async def stripe_webhook(request: Request, stripe_signature: str = Header(None),
 
     if event["type"] == "checkout.session.completed":
         session = event["data"]["object"]
-        payment = db.query(models.Payment).filter(models.Payment.stripe_session_id == session["id"]).first()
+        payment = db.query(models.Payment).filter(
+            models.Payment.stripe_session_id == session["id"]
+        ).with_for_update().first()
         if payment and payment.status == "pending":
             payment.status = "completed"
             user = db.query(models.User).filter(models.User.id == payment.user_id).first()

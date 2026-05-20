@@ -21,6 +21,13 @@ class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
+class UserRecover(BaseModel):
+    email: EmailStr
+
+class UserReset(BaseModel):
+    token: str
+    password: str
+
 class UserOut(BaseModel):
     id: int
     email: str

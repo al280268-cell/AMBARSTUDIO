@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, type KeyboardEvent, type ChangeEvent } from 'react';
+import ReactMarkdown from 'react-markdown';
 import api from '../services/api';
 import type { ChatMessage } from '../types';
 
@@ -84,9 +85,8 @@ export default function ChatWidget() {
 
       <div className="chat-widget-messages">
         {messages.map((m, i) => (
-          <div key={i} className={`chat-widget-message ${m.role === 'user' ? 'user' : 'assistant'}`}
-            style={{ whiteSpace: 'pre-wrap' }}>
-            {m.content}
+          <div key={i} className={`chat-widget-message ${m.role === 'user' ? 'user' : 'assistant'}`}>
+            <ReactMarkdown>{m.content}</ReactMarkdown>
           </div>
         ))}
         {loading && <div className="chat-widget-message assistant animate-pulse">Escribiendo...</div>}

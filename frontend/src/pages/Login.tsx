@@ -58,16 +58,17 @@ export default function Login() {
             {loading ? <div className="spinner" style={{ width: 20, height: 20, borderWidth: 2 }} /> : 'Iniciar Sesión'}
           </button>
 
-          <div className="auth-switch">
-            <span>¿No tienes cuenta? </span>
-            <Link to="/register" className="auth-link">Regístrate</Link>
+          <div className="auth-switch" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div>
+              <span>¿No tienes cuenta? </span>
+              <Link to="/register" className="auth-link">Regístrate</Link>
+            </div>
+            <div>
+              <Link to="/recover-password" className="auth-link" style={{ fontSize: '13px' }}>¿Olvidaste tu contraseña?</Link>
+            </div>
           </div>
         </form>
 
-        <div className="demo-hint">
-          <p className="demo-hint-label">Cuenta Demo</p>
-          <p className="demo-hint-value">demo@ambar.studio / demo123</p>
-        </div>
       </div>
     </main>
   );

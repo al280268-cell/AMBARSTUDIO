@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 import models
 import schemas
-from auth import hash_password, verify_password, create_access_token, get_current_user
+from auth import hash_password, verify_password, create_access_token, get_current_user, create_reset_token, decode_reset_token
 from security import (
     rate_limiter,
     validate_registration_role,
@@ -16,6 +16,7 @@ from security import (
     sanitize_string,
     check_suspicious_input,
 )
+from encryption import encrypt_data, decrypt_data
 
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 
@@ -58,14 +59,14 @@ def register(data: schemas.UserRegister, request: Request, db: Session = Depends
     # Check if email already exists — use generic message to prevent enumeration
     existing = db.query(models.User).filter(models.User.email == data.email).first()
     if existing:
-        raise HTTPException(status_code=400, detail="No se pudo crear la cuenta. Verifica tus datos.")
+        raise HTTPException(status_code=400, detail="El correo ya está registrado")
 
     user = models.User(
         email=data.email,
         password_hash=hash_password(data.password),
-        name=name,
+        name=encrypt_data(name),
         role=role,
-        city=city,
+        city=encrypt_data(city) if city else "",
         tokens_balance=3,  # Free tokens on signup
         plan="free",
     )
@@ -74,9 +75,15 @@ def register(data: schemas.UserRegister, request: Request, db: Session = Depends
     db.refresh(user)
 
     token = create_access_token({"sub": str(user.id), "role": user.role})
+    
+    # Decrypt for response
+    user_out = schemas.UserOut.model_validate(user)
+    user_out.name = decrypt_data(user.name)
+    user_out.city = decrypt_data(user.city) if user.city else ""
+
     return schemas.TokenResponse(
         access_token=token,
-        user=schemas.UserOut.model_validate(user),
+        user=user_out,
     )
 
 
@@ -102,16 +109,55 @@ def login(data: schemas.UserLogin, request: Request, db: Session = Depends(get_d
     rate_limiter.clear_login_failures(client_ip)
 
     token = create_access_token({"sub": str(user.id), "role": user.role})
+    
+    # Decrypt for response
+    user_out = schemas.UserOut.model_validate(user)
+    user_out.name = decrypt_data(user.name)
+    user_out.city = decrypt_data(user.city) if user.city else ""
+
     return schemas.TokenResponse(
         access_token=token,
-        user=schemas.UserOut.model_validate(user),
+        user=user_out,
     )
+
+
+@router.post("/recover")
+def recover_password(data: schemas.UserRecover, db: Session = Depends(get_db)):
+    """Generate a password recovery token."""
+    user = db.query(models.User).filter(models.User.email == data.email).first()
+    if not user:
+        # Generic message
+        return {"detail": "Si el correo existe, se ha enviado un enlace de recuperación."}
+
+    token = create_reset_token(user.email)
+    # Simulate sending email by logging to console
+    print(f"\n[RECOVERY TOKEN PARA {user.email}]: {token}\n")
+    
+    return {"detail": "Si el correo existe, se ha enviado un enlace de recuperación.", "demo_token": token}
+
+
+@router.post("/reset")
+def reset_password(data: schemas.UserReset, db: Session = Depends(get_db)):
+    """Reset password using recovery token."""
+    email = decode_reset_token(data.token)
+    user = db.query(models.User).filter(models.User.email == email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+    validate_password_strength(data.password)
+    user.password_hash = hash_password(data.password)
+    db.commit()
+
+    return {"detail": "Contraseña actualizada exitosamente"}
 
 
 @router.get("/me", response_model=schemas.UserOut)
 def get_me(current_user: models.User = Depends(get_current_user)):
     """Get current authenticated user profile."""
-    return schemas.UserOut.model_validate(current_user)
+    user_out = schemas.UserOut.model_validate(current_user)
+    user_out.name = decrypt_data(current_user.name)
+    user_out.city = decrypt_data(current_user.city) if current_user.city else ""
+    return user_out
 
 
 @router.patch("/me", response_model=schemas.UserOut)
@@ -128,15 +174,20 @@ def update_me(
             raise HTTPException(status_code=400, detail="Nombre demasiado largo")
         if check_suspicious_input(name):
             raise HTTPException(status_code=400, detail="Nombre contiene caracteres no válidos")
-        current_user.name = name
+        current_user.name = encrypt_data(name)
     if city:
         city = sanitize_string(city)
         if check_suspicious_input(city):
             raise HTTPException(status_code=400, detail="Ciudad contiene caracteres no válidos")
-        current_user.city = city
+        current_user.city = encrypt_data(city)
     db.commit()
     db.refresh(current_user)
-    return schemas.UserOut.model_validate(current_user)
+    
+    user_out = schemas.UserOut.model_validate(current_user)
+    user_out.name = decrypt_data(current_user.name)
+    user_out.city = decrypt_data(current_user.city) if current_user.city else ""
+    
+    return user_out
 
 
 @router.get("/users")
@@ -145,4 +196,4 @@ def get_all_users(current_user: models.User = Depends(get_current_user), db: Ses
     if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="No autorizado")
     users = db.query(models.User).order_by(models.User.id.desc()).all()
-    return [{"id": u.id, "name": u.name, "email": u.email, "role": u.role, "city": u.city, "plan": u.plan, "tokens_balance": u.tokens_balance} for u in users]
+    return [{"id": u.id, "name": decrypt_data(u.name), "email": u.email, "role": u.role, "city": decrypt_data(u.city) if u.city else "", "plan": u.plan, "tokens_balance": u.tokens_balance} for u in users]

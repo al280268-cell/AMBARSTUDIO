@@ -95,15 +95,15 @@ rate_limiter = RateLimiter()
 
 # Rate limit configurations per endpoint pattern
 RATE_LIMITS = {
-    "/api/auth/login": (5, 60),       # 5 attempts per minute
-    "/api/auth/register": (3, 60),    # 3 registrations per minute
-    "/api/chat": (20, 60),            # 20 messages per minute
-    "/api/projects/generate": (3, 60),  # 3 AI generations per minute
-    "/api/payments": (10, 60),        # 10 payment operations per minute
+    "/api/auth/login": (3, 60),       # 3 attempts per minute
+    "/api/auth/register": (2, 60),    # 2 registrations per minute
+    "/api/chat": (10, 60),            # 10 messages per minute
+    "/api/projects/generate": (2, 60),  # 2 AI generations per minute
+    "/api/payments": (5, 60),         # 5 payment operations per minute
 }
 
 # General rate limit for all API endpoints
-GENERAL_RATE_LIMIT = (100, 60)  # 100 requests per minute per IP
+GENERAL_RATE_LIMIT = (30, 60)  # 30 requests per minute per IP
 
 
 # ──────────────────────────────────────────────

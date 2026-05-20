@@ -21,7 +21,7 @@ class User(Base):
     role = Column(String(20), default="user")  # "user" or "provider"
     tokens_balance = Column(Integer, default=3)  # Free tier starts with 3 tokens
     plan = Column(String(50), default="free")  # free, individual, depto, casa, edificio
-    city = Column(String(100), default="")
+    city = Column(String(500), default="")
     avatar_url = Column(String(500), default="")
     created_at = Column(DateTime, server_default=func.now())
 
@@ -42,11 +42,11 @@ class Provider(Base):
     business_name = Column(String(255), nullable=False)
     bio = Column(Text, default="")
     categories = Column(JSON, default=list)  # ["textiles", "madera", "metal", ...]
-    whatsapp = Column(String(100), default="")
-    instagram = Column(String(100), default="")
-    contact_email = Column(String(255), default="")
-    coverage = Column(String(20), default="local")  # "local" or "national"
-    city = Column(String(100), default="")
+    whatsapp = Column(String(500), default="")
+    instagram = Column(String(500), default="")
+    contact_email = Column(String(500), default="")
+    coverage = Column(String(50), default="local")  # "local" or "national"
+    city = Column(String(500), default="")
     lat = Column(Float, nullable=True)
     lng = Column(Float, nullable=True)
     rating = Column(Float, default=0.0)
@@ -75,6 +75,7 @@ class Product(Base):
     unit = Column(String(50), default="unidad") # m2, litro, pieza
     category = Column(String(100), default="")
     image_url = Column(String(500), default="")
+    is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, server_default=func.now())
 
     # Relationships
@@ -97,6 +98,7 @@ class Project(Base):
     area = Column(Float, default=25.0)  # m² (width * length)
     status = Column(String(30), default="draft")  # draft, uploading, generating, completed, failed
     ai_prompt_used = Column(Text, default="")
+    is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
