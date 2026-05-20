@@ -24,9 +24,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const data: AuthData = JSON.parse(stored);
         setUser(data.user);
         // Refresh user data from server
-        api.getMe().then(u => setUser(u)).catch(() => {
-          localStorage.removeItem('ambar_auth');
-          setUser(null);
+        api.getMe().then(u => setUser(u)).catch((err) => {
+          if (err.message === 'Sesión expirada' || err.message.includes('401')) {
+            localStorage.removeItem('ambar_auth');
+            setUser(null);
+          }
         });
       } catch { localStorage.removeItem('ambar_auth'); }
     }

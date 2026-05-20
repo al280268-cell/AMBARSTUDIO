@@ -103,7 +103,7 @@ RATE_LIMITS = {
 }
 
 # General rate limit for all API endpoints
-GENERAL_RATE_LIMIT = (30, 60)  # 30 requests per minute per IP
+GENERAL_RATE_LIMIT = (120, 60)  # 120 requests per minute per IP
 
 
 # ──────────────────────────────────────────────
