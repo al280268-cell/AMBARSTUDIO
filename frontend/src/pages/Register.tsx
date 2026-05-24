@@ -19,8 +19,8 @@ export default function Register() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (form.password.length < 6) { setError('La contraseña debe tener al menos 6 caracteres'); return; }
     setError('');
+    if (form.password.length < 6) { setError('La contraseña debe tener al menos 6 caracteres'); return; }
     setLoading(true);
     try {
       await register(form);

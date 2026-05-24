@@ -249,26 +249,11 @@ def validate_registration_role(role: str) -> str:
 # Password Policy
 # ──────────────────────────────────────────────
 def validate_password_strength(password: str) -> None:
-    """Enforce minimum password requirements."""
-    if len(password) < 8:
+    """Enforce minimum password requirements (must match UI messaging)."""
+    if len(password) < 6:
         raise HTTPException(
             status_code=400,
-            detail="La contraseña debe tener al menos 8 caracteres."
-        )
-    if not re.search(r"[A-Z]", password):
-        raise HTTPException(
-            status_code=400,
-            detail="La contraseña debe tener al menos una mayúscula."
-        )
-    if not re.search(r"[a-z]", password):
-        raise HTTPException(
-            status_code=400,
-            detail="La contraseña debe tener al menos una minúscula."
-        )
-    if not re.search(r"\d", password):
-        raise HTTPException(
-            status_code=400,
-            detail="La contraseña debe tener al menos un número."
+            detail="La contraseña debe tener al menos 6 caracteres."
         )
 
 

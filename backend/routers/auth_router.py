@@ -70,7 +70,7 @@ def register(data: schemas.UserRegister, request: Request, db: Session = Depends
         name=encrypt_data(name),
         role=role,
         city=encrypt_data(city) if city else "",
-        tokens_balance=3,  # Free tokens on signup
+        tokens_balance=45,  # 3 renders gratuitos × 15 tokens c/u
         plan="free",
     )
     db.add(user)
