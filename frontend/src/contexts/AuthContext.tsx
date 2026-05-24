@@ -22,15 +22,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (stored) {
       try {
         const data: AuthData = JSON.parse(stored);
+        // Set user immediately from stored data so UI renders right away
         setUser(data.user);
-        // Refresh user data from server
-        api.getMe().then(u => setUser(u)).catch((err) => {
-          if (err.message === 'Sesión expirada' || err.message.includes('401')) {
-            localStorage.removeItem('ambar_auth');
-            setUser(null);
-          }
-        });
-      } catch { localStorage.removeItem('ambar_auth'); }
+        // Silently refresh from server in background — NEVER log out on network error
+        api.getMe()
+          .then(u => {
+            setUser(u);
+            // Keep stored token, just update the user object
+            const fresh = { ...data, user: u };
+            localStorage.setItem('ambar_auth', JSON.stringify(fresh));
+          })
+          .catch((err: Error) => {
+            // ONLY logout if server explicitly says token is invalid (401)
+            // Ignore network failures, timeouts, 500 errors, etc.
+            const msg = err?.message || '';
+            if (msg === 'Sesión expirada' || msg === 'Token inválido o expirado' || msg === 'Token inválido') {
+              localStorage.removeItem('ambar_auth');
+              setUser(null);
+            }
+            // Otherwise keep the user logged in — network may be temporarily down
+          });
+      } catch {
+        localStorage.removeItem('ambar_auth');
+      }
     }
     setLoading(false);
   }, []);

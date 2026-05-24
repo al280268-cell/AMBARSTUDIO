@@ -6,6 +6,23 @@ import type { Project, Provider, GenerateResult, PlanDeliverable } from '../type
 
 const STYLES = ['Minimalista', 'Moderno', 'Hogareño Cálido', 'Escandinavo Orgánico', 'Brutalismo Suave', 'Plano 2D Básico', 'Plano Arquitectónico (Blueprint)'];
 
+// Max area (m²) allowed per plan before suggesting upgrade
+const PLAN_AREA_LIMITS: Record<string, number> = {
+  free:       20,
+  habitacion: 35,
+  depto:      120,
+  casa:       500,
+  edificio:   Infinity,
+};
+
+const NEXT_PLAN: Record<string, string> = {
+  free:       'Habitación',
+  habitacion: 'Departamento',
+  depto:      'Casa',
+  casa:       'Edificio',
+  edificio:   '',
+};
+
 const PLAN_DELIVERABLES: Record<string, PlanDeliverable> = {
   free: { label: 'Discovery', entregable: 'Render simple con marca de agua', icon: 'image', showMaterials: false, showProviders: false, watermark: true },
   habitacion: { label: 'Habitación', entregable: 'Lista de materiales + Presupuesto', icon: 'receipt_long', showMaterials: true, showProviders: true, watermark: false },
@@ -120,6 +137,15 @@ export default function AIStudio() {
 
   const area = dims.width * dims.length;
   const pd = PLAN_DELIVERABLES[user?.plan || 'free'] || PLAN_DELIVERABLES.free;
+  const planLimit = PLAN_AREA_LIMITS[user?.plan || 'free'] ?? 20;
+  const areaExceedsLimit = area > planLimit;
+  const nextPlan = NEXT_PLAN[user?.plan || 'free'] || 'Edificio';
+
+  // Eco savings calculation (approximate)
+  const CO2_PER_M2 = 8.5; // kg CO2 saved per m² with sustainable choices
+  const TREES_PER_M2 = 0.04;
+  const co2Saved = (area * CO2_PER_M2).toFixed(1);
+  const treesSaved = (area * TREES_PER_M2).toFixed(1);
 
   return (
     <main className="page page-surface-low">
@@ -138,6 +164,28 @@ export default function AIStudio() {
             {error.includes('tokens') && (
               <Link to="/plans" className="btn btn-primary btn-sm" style={{ whiteSpace: 'nowrap' }}>Adquirir Tokens</Link>
             )}
+          </div>
+        )}
+
+        {/* Area exceeds plan limit warning */}
+        {areaExceedsLimit && step !== 'result' && (
+          <div role="alert" style={{
+            marginBottom: 24, padding: '14px 20px', borderRadius: 'var(--radius-md)',
+            background: 'linear-gradient(135deg, #fff8e1, #fff3cd)',
+            border: '1.5px solid #f59e0b',
+            display: 'flex', alignItems: 'flex-start', gap: 12,
+          }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 20, color: '#f59e0b', flexShrink: 0, marginTop: 1 }}>info</span>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 700, fontSize: 14, color: '#92400e', marginBottom: 4 }}>
+                ⚠️ Tu área ({area}m²) supera el límite del Plan {pd.label} ({planLimit}m²)
+              </div>
+              <div style={{ fontSize: 13, color: '#78350f', lineHeight: 1.5 }}>
+                Aunque tengas tokens disponibles, para espacios más grandes necesitas el <strong>Plan {nextPlan}</strong>.
+                Los tokens te dan acceso a renders, pero el plan define la escala y los entregables que puedes generar.
+              </div>
+            </div>
+            <Link to="/plans" className="btn btn-primary btn-sm" style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>Mejorar Plan</Link>
           </div>
         )}
 
@@ -263,6 +311,36 @@ export default function AIStudio() {
                 </button>
               )}
             </div>
+
+            {/* Nature / Eco savings */}
+            {step === 'result' && (
+              <div className="card animate-fade-in-up" style={{
+                padding: 20,
+                background: 'linear-gradient(135deg, #e8f5e9, #f1f8e9)',
+                border: '1.5px solid #a5d6a7',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                  <span className="material-symbols-outlined filled" style={{ color: '#2e7d32', fontSize: 22 }}>eco</span>
+                  <span style={{ fontFamily: 'var(--font-label)', fontWeight: 700, fontSize: 13, color: '#1b5e20', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Impacto Ambiental Positivo</span>
+                </div>
+                <p style={{ fontSize: 12, color: '#2e7d32', lineHeight: 1.5, marginBottom: 12 }}>
+                  Al diseñar con IA antes de comprar materiales evitas el desperdicio. Con este proyecto de <strong>{area}m²</strong> estimamos:
+                </p>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  <div style={{ background: 'rgba(255,255,255,0.7)', borderRadius: 10, padding: 12, textAlign: 'center' }}>
+                    <div style={{ fontSize: 24, fontFamily: 'var(--font-headline)', color: '#2e7d32', fontWeight: 800 }}>{co2Saved}kg</div>
+                    <div style={{ fontSize: 11, color: '#388e3c', fontWeight: 600 }}>CO₂ evitado</div>
+                  </div>
+                  <div style={{ background: 'rgba(255,255,255,0.7)', borderRadius: 10, padding: 12, textAlign: 'center' }}>
+                    <div style={{ fontSize: 24, fontFamily: 'var(--font-headline)', color: '#2e7d32', fontWeight: 800 }}>🌳 {treesSaved}</div>
+                    <div style={{ fontSize: 11, color: '#388e3c', fontWeight: 600 }}>Equivalente en árboles</div>
+                  </div>
+                </div>
+                <p style={{ fontSize: 11, color: '#4caf50', marginTop: 10, textAlign: 'center' }}>
+                  *Estimación basada en reducción de desperdicio de materiales con diseño previo
+                </p>
+              </div>
+            )}
 
             {/* Plan Deliverable Info */}
             {step === 'result' && (
