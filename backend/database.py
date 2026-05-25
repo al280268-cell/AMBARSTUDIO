@@ -25,19 +25,23 @@ if "sqlite" in DATABASE_URL:
     connect_args["check_same_thread"] = False
     engine_kwargs["connect_args"] = connect_args
 
-elif "pg8000" in DATABASE_URL:
-    # PostgreSQL via pg8000 (Supabase / Vercel)
-    import ssl
-    ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
-    connect_args["ssl_context"] = ctx
-    engine_kwargs["connect_args"] = connect_args
-    # Supabase transaction pooler doesn't support prepared statements
+elif "psycopg2" in DATABASE_URL or "postgresql" in DATABASE_URL:
+    # PostgreSQL via psycopg2 (Supabase / production)
+    # SSL mode is passed via ?sslmode=require in the URL
     engine_kwargs["pool_pre_ping"] = True
     engine_kwargs["pool_recycle"] = 300
     engine_kwargs["pool_size"] = 2
     engine_kwargs["max_overflow"] = 3
+
+elif "pg8000" in DATABASE_URL:
+    # Fallback: PostgreSQL via pg8000
+    import ssl as _ssl
+    ctx = _ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = _ssl.CERT_NONE
+    connect_args["ssl_context"] = ctx
+    engine_kwargs["connect_args"] = connect_args
+    engine_kwargs["pool_pre_ping"] = True
 
 engine = None
 SessionLocal = None

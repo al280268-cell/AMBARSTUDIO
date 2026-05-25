@@ -34,20 +34,25 @@ class Settings:
     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
 
     # Database
-    _db_url = os.getenv("DATABASE_URL")
+    _db_url = os.getenv("DATABASE_URL", "")
+    DATABASE_URL: str
     if _db_url:
-        if "?" in _db_url:
-            _db_url = _db_url.split("?")[0]  # Remove ?sslmode=require which breaks pg8000
+        # Use psycopg2 (better Supabase compatibility than pg8000)
         if _db_url.startswith("postgres://"):
-            _db_url = _db_url.replace("postgres://", "postgresql+pg8000://", 1)
-        elif _db_url.startswith("postgresql://"):
-            _db_url = _db_url.replace("postgresql://", "postgresql+pg8000://", 1)
-            
-    DATABASE_URL: str = _db_url or (
-        "sqlite:////tmp/ambar_studio.db"   # Vercel: /tmp is the only writable dir
-        if os.getenv("VERCEL")
-        else "sqlite:///./ambar_studio_dev.db"  # Local dev
-    )
+            _db_url = _db_url.replace("postgres://", "postgresql+psycopg2://", 1)
+        elif _db_url.startswith("postgresql://") and "+" not in _db_url.split("://")[0]:
+            _db_url = _db_url.replace("postgresql://", "postgresql+psycopg2://", 1)
+        # Add SSL for Supabase if not already present
+        if "supabase" in _db_url and "sslmode" not in _db_url:
+            _db_url += "?sslmode=require"
+        DATABASE_URL = _db_url
+    else:
+        DATABASE_URL = (
+            "sqlite:////tmp/ambar_studio.db"   # Vercel: /tmp is the only writable dir
+            if os.getenv("VERCEL")
+            else "sqlite:///./ambar_studio_dev.db"  # Local dev
+        )
+
 
     # AI
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
