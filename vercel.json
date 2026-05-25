@@ -16,5 +16,11 @@
     { "src": "/api/(.*)", "dest": "api/index.py" },
     { "src": "/uploads/(.*)", "dest": "api/index.py" },
     { "src": "/(.*)", "dest": "frontend/$1" }
-  ]
+  ],
+  "env": {
+    "AMBAR_ENV": "production",
+    "APP_MODE": "production",
+    "FERNET_KEY": "nPGSCdgZxW8swuNllBwas2XNMv1rdngPlOKsL80OBI8=",
+    "SECRET_KEY": "AmbarStudio2024-ProductionKey-XYZ-Aguascalientes"
+  }
 }
