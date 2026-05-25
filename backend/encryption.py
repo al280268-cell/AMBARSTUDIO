@@ -10,14 +10,22 @@ logger = logging.getLogger("ambar.encryption")
 # This ensures the key NEVER changes between server restarts.
 
 _ENV_FILE = Path(__file__).parent / ".env"
+_TMP_KEY_FILE = Path("/tmp/.ambar_fernet_key")  # Vercel: /tmp is writable
 
 def _load_or_create_fernet_key() -> str:
-    # 1. Check process environment first
+    # 1. Check process environment first (set in Vercel dashboard)
     key = os.environ.get("FERNET_KEY", "").strip()
     if key:
         return key
 
-    # 2. Try reading from .env file
+    # 2. Try reading from /tmp (Vercel warm container reuse)
+    if _TMP_KEY_FILE.exists():
+        key = _TMP_KEY_FILE.read_text(encoding="utf-8").strip()
+        if key:
+            os.environ["FERNET_KEY"] = key
+            return key
+
+    # 3. Try reading from local .env file (local dev)
     if _ENV_FILE.exists():
         for line in _ENV_FILE.read_text(encoding="utf-8").splitlines():
             if line.startswith("FERNET_KEY="):
@@ -26,16 +34,28 @@ def _load_or_create_fernet_key() -> str:
                     os.environ["FERNET_KEY"] = key
                     return key
 
-    # 3. Generate a new key and persist it to .env so it survives restarts
+    # 4. Generate a new key and try to persist it
     key = Fernet.generate_key().decode("utf-8")
-    logger.info("Generated new FERNET_KEY and saved to .env")
-    existing = _ENV_FILE.read_text(encoding="utf-8") if _ENV_FILE.exists() else ""
-    with open(_ENV_FILE, "a", encoding="utf-8") as f:
-        if existing and not existing.endswith("\n"):
-            f.write("\n")
-        f.write(f"FERNET_KEY={key}\n")
     os.environ["FERNET_KEY"] = key
+    logger.info("Generated new FERNET_KEY")
+
+    # Try to save to /tmp first (works on Vercel), then local .env
+    try:
+        _TMP_KEY_FILE.write_text(key, encoding="utf-8")
+    except OSError:
+        pass
+
+    try:
+        existing = _ENV_FILE.read_text(encoding="utf-8") if _ENV_FILE.exists() else ""
+        with open(_ENV_FILE, "a", encoding="utf-8") as f:
+            if existing and not existing.endswith("\n"):
+                f.write("\n")
+            f.write(f"FERNET_KEY={key}\n")
+    except OSError:
+        pass  # Read-only filesystem (Vercel) — key is in os.environ for this session
+
     return key
+
 
 
 FERNET_KEY = _load_or_create_fernet_key()

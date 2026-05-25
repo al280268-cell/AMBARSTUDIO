@@ -1,7 +1,4 @@
-# ══════════════════════════════════════════════════════════
-# AMBAR STUDIO — Dependencias Python
-# pip install -r requirements.txt
-# ══════════════════════════════════════════════════════════
+# AMBAR STUDIO — Dependencias Python (compatibles con Vercel serverless)
 
 # === Core Framework ===
 fastapi==0.104.1
@@ -10,7 +7,7 @@ sqlalchemy==2.0.23
 
 # === Authentication ===
 python-jose[cryptography]==3.3.0
-passlib==1.7.4
+passlib[bcrypt]==1.7.4
 bcrypt==4.0.1
 
 # === File Upload ===
@@ -42,6 +39,5 @@ pydantic[email]==2.5.3
 # === Async Support ===
 greenlet==3.0.3
 
-# === Production (uncomment for cloud deployment) ===
-# gunicorn==21.2.0
-pg8000==1.30.3
+# === Encryption ===
+cryptography==41.0.7
