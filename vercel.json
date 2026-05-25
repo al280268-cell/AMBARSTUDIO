@@ -15,7 +15,11 @@
   "routes": [
     { "src": "/api/(.*)", "dest": "api/index.py" },
     { "src": "/uploads/(.*)", "dest": "api/index.py" },
-    { "src": "/(.*)", "dest": "frontend/$1" }
+    {
+      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|map|webp))",
+      "dest": "frontend/$1"
+    },
+    { "src": "/(.*)", "dest": "frontend/index.html" }
   ],
   "env": {
     "AMBAR_ENV": "production",
