@@ -43,7 +43,11 @@ class Settings:
         elif _db_url.startswith("postgresql://"):
             _db_url = _db_url.replace("postgresql://", "postgresql+pg8000://", 1)
             
-    DATABASE_URL: str = _db_url or ("sqlite:////tmp/ambar_studio.db" if os.getenv("VERCEL") else "sqlite:///./ambar_studio.db")
+    DATABASE_URL: str = _db_url or (
+        "sqlite:////tmp/ambar_studio.db"   # Vercel: /tmp is the only writable dir
+        if os.getenv("VERCEL")
+        else "sqlite:///./ambar_studio_dev.db"  # Local dev
+    )
 
     # AI
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
