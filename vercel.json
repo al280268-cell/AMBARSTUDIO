@@ -26,7 +26,7 @@
     "APP_MODE": "production",
     "FERNET_KEY": "nPGSCdgZxW8swuNllBwas2XNMv1rdngPlOKsL80OBI8=",
     "SECRET_KEY": "AmbarStudio2024-ProductionKey-XYZ-Aguascalientes",
-    "DATABASE_URL": "postgresql://postgres:TaekLmno1235@db.ypuokfpdwsgfiodkausc.supabase.co:5432/postgres?sslmode=require",
+    "DATABASE_URL": "postgresql://postgres:Ambar2024secure!@db.ypuokfpdwsgfiodkausc.supabase.co:5432/postgres?sslmode=require",
     "SUPABASE_URL": "https://ypuokfpdwsgfiodkausc.supabase.co",
     "SUPABASE_SERVICE_ROLE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlwdW9rZnBkd3NnZmlvZGthdXNjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3OTY5ODQ1NCwiZXhwIjoyMDk1Mjc0NDU0fQ.4gMxR6AVV8C8q-iwEULfH9qOqMnXcBAPUh820VrNzVc"
   }
