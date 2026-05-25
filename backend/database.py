@@ -43,10 +43,19 @@ engine = None
 SessionLocal = None
 try:
     engine = create_engine(DATABASE_URL, **engine_kwargs)
+    # Test connection immediately to catch auth errors early
+    with engine.connect() as conn:
+        conn.execute(text("SELECT 1"))
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-    logger.info(f"[DB] Engine created — {'SQLite' if 'sqlite' in DATABASE_URL else 'PostgreSQL (Supabase)'}")
+    logger.info(f"[DB] Engine created and tested OK — {'SQLite' if 'sqlite' in DATABASE_URL else 'PostgreSQL (Supabase)'}")
 except Exception as e:
+    import traceback
     logger.error(f"[DB] Engine creation failed: {e}")
+    logger.error(traceback.format_exc())
+    # Store error for /api/health to report
+    import os
+    os.environ["DB_ERROR"] = str(e)
+
 
 Base = declarative_base()
 

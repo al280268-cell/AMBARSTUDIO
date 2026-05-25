@@ -136,9 +136,12 @@ def root():
 
 @app.get("/api/health")
 def health():
+    import os
     return {
         "status": "ok",
         "mode": settings.APP_MODE,
         "version": "1.0.0",
-        "error": startup_error
+        "startup_error": startup_error,
+        "db_error": os.environ.get("DB_ERROR"),
+        "db_url_hint": settings.DATABASE_URL[:40] + "..." if settings.DATABASE_URL else None,
     }
