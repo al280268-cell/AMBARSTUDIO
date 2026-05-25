@@ -72,7 +72,7 @@ app = FastAPI(
     redoc_url="/redoc" if settings.is_development else None,
 )
 
-# ── Global error handler (debug) ──
+# ── Global error handler ──
 import traceback as _tb
 from fastapi import Request as _Request
 from fastapi.responses import JSONResponse as _JSONResponse
@@ -81,9 +81,14 @@ from fastapi.responses import JSONResponse as _JSONResponse
 async def global_exception_handler(request: _Request, exc: Exception):
     err = _tb.format_exc()
     logger.error(f"Unhandled exception: {err}")
+    if settings.is_development:
+        return _JSONResponse(
+            status_code=500,
+            content={"detail": str(exc), "traceback": err[-1500:]},
+        )
     return _JSONResponse(
         status_code=500,
-        content={"detail": str(exc), "traceback": err[-1500:]},
+        content={"detail": "Internal Server Error"},
     )
 
 
