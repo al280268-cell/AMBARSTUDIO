@@ -72,6 +72,21 @@ app = FastAPI(
     redoc_url="/redoc" if settings.is_development else None,
 )
 
+# ── Global error handler (debug) ──
+import traceback as _tb
+from fastapi import Request as _Request
+from fastapi.responses import JSONResponse as _JSONResponse
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: _Request, exc: Exception):
+    err = _tb.format_exc()
+    logger.error(f"Unhandled exception: {err}")
+    return _JSONResponse(
+        status_code=500,
+        content={"detail": str(exc), "traceback": err[-1500:]},
+    )
+
+
 # ── Vercel Path Rewrite Middleware ──
 @app.middleware("http")
 async def rewrite_vercel_paths(request: Request, call_next):
